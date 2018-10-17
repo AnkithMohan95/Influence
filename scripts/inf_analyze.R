@@ -1,17 +1,20 @@
-#Load packages
-#require(ProNet) No longer supported
-require(igraph)
-require(abind)
-require(sna)
-require(ergm.count)
-require(network)
-#require(tcltk) No longer supported
-require(tcltk2)
-
-inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
+################################################################################
+# INFLUENCE ANALYSIS
+################################################################################
+inf_analyze <- function(input_file, file_sep = " ", file_header = F, output_path){
+  # Identifies influentials in `input_file` using the techniques discussed in:
+  # Krishnaraj, P. M., Ankith Mohan, and K. G. Srinivasa. "Performance of procedures for identifying influentials in a social network: prediction of time and memory usage as a function of network properties." Social Network Analysis and Mining 7.1 (2017): 34.
+  #
+  # Parameters:
+  # - input_file: Absolute path to the input file
+  # - file_sep: File separator
+  # - file_header: File header
+  # - output_path: Absolute path to the output directory
+  #
+  # Returns
 
   #Take user input and convert to graph object
-  input <- read.csv(ip_file , sep = file_sep, header = FALSE)
+  input <- read.csv(input_file , sep = file_sep, header = file_header)
   graph <- simplify(graph.data.frame(input, directed = FALSE))
 
   #Initialise variables
@@ -20,20 +23,25 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
   temporary <- vector("numeric", 9)
   difference <- vector("numeric", 9)
   result <- 0
+  #set.seed(123)
 
   #sample until stopping criterion is satisfied
   stop_index <- 1
   while(percentage < 1){
     #Sample percentage amount of vertices and cluster
     length <- vcount(graph) * percentage
-    set.seed(123)
-    subgraph <- extraction(graph, mode = "sample", sample.number = length)
+
+    # Since ProNet is no longer supported by CRAN, `extraction` function can no
+    # longer be used
+    # subgraph <- extraction(graph, mode = "sample", sample.number = length)
+
+    subgraph <- induced_subgraph(graph, sample(V(graph), length))
     fastgreedy_results <- cluster_fast_greedy(subgraph)
     V(subgraph)$color <- fastgreedy_results$membership
     plot(subgraph, main = paste(percentage * 100, "% sample"),
          vertex.color = V(subgraph)$color, layout = layout.fruchterman.reingold)
     visualise(object = subgraph, vcolor = V(subgraph)$color,
-              save_file = paste(op_path, "/sample/sample_", percentage * 100, ".eps", sep = ""))
+              save_file = paste(output_path, "/sample/sample_", percentage * 100, ".eps", sep = ""))
 
     #Store only those clusters that have greater than 1% of total number of vertices
     #that were sampled in major_size_fastgreedy_results
@@ -195,7 +203,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
     if(sum(all_pageranks) > 0){
       #find the cluster in which the not_yet element has highest pagerank
       index <- which(max(all_pageranks) == all_pageranks)
-      print("Clustered to which the randomly selected vertex has been determined to belong:")
+      print("Cluster to which the randomly selected vertex has been determined to belong:")
       print(index)
 
       #find the index of the last edge
@@ -251,7 +259,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
     plot(main = paste("Cluster", each_cluster, sep = " "), cluster_graph,
          vertex.color = "gold", layout = layout.fruchterman.reingold)
     visualise(object = cluster_graph,
-              save_file = paste(op_path, "/cluster/cluster_", each_cluster, ".eps", sep = ""))
+              save_file = paste(output_path, "/cluster/cluster_", each_cluster, ".eps", sep = ""))
 
     #get adjacency matrix of the cluster
     cluster_graph_adj <- get.adjacency(cluster_graph, sparse = FALSE)
@@ -281,7 +289,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
     sdcut <- names(V(cluster_graph)[in_ties > cutoff_sd])
 
     #save plot as Screeplot<no>.png
-    png(file = paste(op_path, "/screeplot/screeplot_", each_cluster, ".png", sep =""),
+    png(file = paste(output_path, "/screeplot/screeplot_", each_cluster, ".png", sep =""),
         height = 1600, width = 1000)
     plot(desc_in_ties, main = paste("Scree plot of cluster", each_cluster,
                                     sep = " "), xlab = "Actor", ylab = "In-Ties")
@@ -306,7 +314,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
       legend('topright', c("Influentials", "Non-influentials"),
              col=c('red', 'gold'), bty='n', cex=1, pch=19)
       visualise(object = cluster_graph, vcolor = ifelse(color==1, "red", "gold"),
-                save_file = paste(op_path, "/abscut/abscut_", each_cluster, ".eps", sep = ""))
+                save_file = paste(output_path, "/abscut/abscut_", each_cluster, ".eps", sep = ""))
     }else{
       print(paste("No influentials have been generated by absolute cut method for cluster", each_cluster, sep = " "))
     }
@@ -325,7 +333,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
       legend('topright', c("Influentials", "Non-influentials"),
              col=c('dodgerblue', 'gold'), bty='n', cex=1, pch=19)
       visualise(object = cluster_graph, vcolor = ifelse(color==1, "dodgerblue", "gold"),
-                save_file = paste(op_path, "/fixcut/fixcut_", each_cluster, ".eps", sep = ""))
+                save_file = paste(output_path, "/fixcut/fixcut_", each_cluster, ".eps", sep = ""))
     }else{
       print(paste("No influentials have been generated by fixed percentage of population method for cluster", each_cluster, sep = " "))
     }
@@ -344,7 +352,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
       legend('topright', c("Influentials", "Non-influentials"),
              col=c('green', 'gold'), bty='n', cex=1, pch=19)
       visualise(object = cluster_graph, vcolor = ifelse(color==1, "green", "gold"),
-                save_file = paste(op_path, "/sdcut/sdcut_", each_cluster, ".eps", sep = ""))
+                save_file = paste(output_path, "/sdcut/sdcut_", each_cluster, ".eps", sep = ""))
     }else{
       print(paste("No influentials have been generated by standard deviation method for cluster", each_cluster, sep = " "))
     }
@@ -385,7 +393,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
                bty = 'n', cex = 1)
 
         #save plot as RandomHist<no>.png
-        png(file = paste(op_path, "/randhist/randhist", each_cluster, ".png", sep = ""),
+        png(file = paste(output_path, "/randhist/randhist", each_cluster, ".png", sep = ""),
             width = 1600, height = 1000)
         hist(in.deg.list,
              main = paste("Histogram of Random Permutation of cluster", each_cluster,
@@ -424,7 +432,7 @@ inf_analyze <- function(ip_file = " ", file_sep = " ", op_path = " "){
         legend('topright', c("Influentials", "Non-influentials"),
                col=c('chocolate', 'gold'), bty='n', cex=1, pch=19)
         visualise(object = cluster_graph, vcolor = ifelse(color==1, "chocolate", "gold"),
-                  save_file = paste(op_path, "/randplot/randplot_", each_cluster, ".eps", sep = ""))
+                  save_file = paste(output_path, "/randplot/randplot_", each_cluster, ".eps", sep = ""))
       }else{
         print(paste("The MLE coefficient is Inf. Cluster", each_cluster,
                     "is saturated resulting in no influentials.", sep = " "))
@@ -444,5 +452,3 @@ visualise <- function(object = " ", vcolor = "gold", save_file = " "){
   tkpostscript(canvas, file = save_file)
   tk_close(id)
 }
-
-inf_analyze(ip_file = "~/Influence/data/fulwtdata.txt", op_path = "~/Influence/output/")

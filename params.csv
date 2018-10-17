@@ -1,0 +1,5 @@
+Input file,~/Influence/data_store/fulwtdata.txt
+File separator," "
+File header,F
+Output path,~/Influence/output/
+Seed,123
