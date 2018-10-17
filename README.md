@@ -4,7 +4,9 @@ This repository contains the code for implementing the algorithms given in [Kris
 
 To execute the scripts, do the following:
 1. In *params.csv*, edit the values in column 2, the values after each of the commas.
-   **Do not change column 1, i.e, Input file, File separator, File header, Output path or Seed**. Any change to these words will result in code failure.  
+   1. **Do not change column 1, i.e, Input file, File separator, File header, Output path or Seed**.
+   2. **Do not give a space after the comma**.
+   3. Failure to comply with either of the above steps will result in code failure or abnormal behavior.  
 
 2. **Set the current directory to the `Influence` directory**.
 

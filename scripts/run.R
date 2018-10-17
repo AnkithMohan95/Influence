@@ -12,18 +12,33 @@ if (dirs[[1]][length(dirs[[1]])] != "Influence"){
 params <- read.csv('../params.csv', header = F, stringsAsFactors = F)
 for (key in params[[1]]){
   input_file_idx = match("input file", tolower(params[[1]]))
+  if (input_file_idx == NA){
+    stop("Column 1 of params.csv not as expected. Please revert the first value of column 1 to 'Input file' verbatim")
+  }
   input_file = params[[2]][input_file_idx]
-  
+
   file_sep_idx = match("file separator", tolower(params[[1]]))
+  if (file_sep_idx == NA){
+    stop("Column 1 of params.csv not as expected. Please revert the second value of column 1 to 'File separator' verbatim")
+  }
   file_sep = params[[2]][file_sep_idx]
-  
+
   file_header_idx = match("file header", tolower(params[[1]]))
+  if (file_header_idx == NA){
+    stop("Column 1 of params.csv not as expected. Please revert the third value of column 1 to 'File header' verbatim")
+  }
   file_header = as.logical(params[[2]][file_header_idx])
-  
+
   output_path_idx = match("output path", tolower(params[[1]]))
+  if (output_path_idx == NA){
+    stop("Column 1 of params.csv not as expected. Please revert the fourth value of column 1 to 'Output path' verbatim")
+  }
   output_path = params[[2]][output_path_idx]
-  
+
   seed_idx = match("seed", tolower(params[[1]]))
+  if (seed_idx == NA){
+    stop("Column 1 of params.csv not as expected. Please revert the last value of column 1 to 'Seed' verbatim")
+  }
   set.seed(params[[2]][seed_idx])
 }
 ###############################################################
