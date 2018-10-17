@@ -1,7 +1,4 @@
----
-title: "Influence analysis"
-output: html_notebook
----
+# Influence analysis
 
 This is the interative notebook for [Krishnaraj, P. M., Ankith Mohan, and K. G. Srinivasa. "Performance of procedures for identifying influentials in a social network: prediction of time and memory usage as a function of network properties." Social Network Analysis and Mining 7.1 (2017): 34.](https://link.springer.com/content/pdf/10.1007%2Fs13278-017-0454-1.pdf)
 
@@ -19,24 +16,23 @@ Load the necessary packages
 
 ```{r}
   #Install packages if not present
-  install_or_load <- function(mypkg){
+  install <- function(mypkg){
     if (!(mypkg %in% installed.packages())){
       cat("Package not installed, so installing with dependencies... \n Press CTRL C to abort.")
       Sys.sleep(5)
       install.packages(mypkg, dependencies = T)
     }
-    library(mypkg)
   }
 
-  #Load packages
-  #install_or_load(ProNet) No longer supported
-  install_or_load(igraph)
-  install_or_load(abind)
-  install_or_load(sna)
-  install_or_load(ergm.count)
-  install_or_load(network)
-  #install_or_load(tcltk) No longer supported
-  install_or_load(tcltk2)
+  #Install packages
+  #install(ProNet) No longer supported by CRAN
+  install(igraph)
+  install(abind)
+  install(sna)
+  install(ergm.count)
+  install(network)
+  #install(tcltk) No longer supported by CRAN
+  install(tcltk2)
 ```
 
 ### Diagnostics
@@ -102,7 +98,7 @@ Stopping criterion (Algorithm 4)
   while(percentage < 1){
     length <- vcount(graph) * percentage
     
-    # Since ProNet is no longer supported by CTAN, `extraction` function can no
+    # Since ProNet is no longer supported by CRAN, `extraction` function can no
     # longer be used
     # subgraph <- extraction(graph, mode = "sample", sample.number = length)
     
@@ -333,7 +329,7 @@ Choose vertices from `not yet` and place them in clusters of highest PageRank or
 Create necessary folders in `output` directory
 
 ```{r}
-  create_dir_if_nonexist <- function(name){
+  create_dir_if_nonexist <- function(output_path, name){
     path = paste(output_path, name, sep = "")
     if (!dir.exists(path)){
       warning("Creating directory ", path, "...\n")
