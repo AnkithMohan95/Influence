@@ -1,3 +1,5 @@
+# TO BE UPDATED
+
 # Influence Analysis
 
 This repository contains the code for implementing the algorithms given in [Krishnaraj, P. M., Ankith Mohan, and K. G. Srinivasa. "Performance of procedures for identifying influentials in a social network: prediction of time and memory usage as a function of network properties." Social Network Analysis and Mining 7.1 (2017): 34.](https://link.springer.com/content/pdf/10.1007%2Fs13278-017-0454-1.pdf).
